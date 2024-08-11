@@ -28,7 +28,7 @@ type DataReceiver struct {
 }
 
 func NewDataReceiver() (*DataReceiver, error) {
-	p, err := NewKafkaProducer()
+	p, err := NewKafkaProducer(kafkaTopic)
 
 	if err != nil {
 		return nil, err
