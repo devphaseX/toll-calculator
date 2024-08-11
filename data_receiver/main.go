@@ -9,18 +9,40 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const kafkaTopic = "obudata"
+
 func main() {
-	recv := NewDataReceiver()
+	recv, err := NewDataReceiver()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/ws", recv.handleWS)
 	http.ListenAndServe(":3000", nil)
 }
 
 type DataReceiver struct {
-	conn *websocket.Conn
+	conn     *websocket.Conn
+	producer DataProducer
 }
 
-func NewDataReceiver() *DataReceiver {
-	return &DataReceiver{}
+func NewDataReceiver() (*DataReceiver, error) {
+	p, err := NewKafkaProducer()
+
+	if err != nil {
+		return nil, err
+	}
+
+	p = NewLogginMiddleware(p)
+
+	return &DataReceiver{
+		producer: p,
+	}, nil
+}
+
+func (dr *DataReceiver) produceData(data types.OBUData) error {
+	return dr.producer.ProduceData(data)
 }
 
 func (dr *DataReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +73,9 @@ func (dr *DataReceiver) wsReceiveLoop() {
 			continue
 		}
 
-		fmt.Printf("receive OBU data from [%d] :: <lat %.2f, long %2.f>\n", data.OBUID, data.Lat, data.Long)
+		if err := dr.produceData(data); err != nil {
+			log.Printf("kafka produce error: %v", err)
+			continue
+		}
 	}
 }

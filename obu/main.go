@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	sentInterval = 60
-	wsEndpoint   = "ws://127.0.0.1:3000/ws"
+	wsEndpoint = "ws://127.0.0.1:3000/ws"
 )
 
 func genCoord() float64 {
@@ -67,6 +66,6 @@ func main() {
 			fmt.Printf("%+v\n", data)
 		}
 
-		time.Sleep(sentInterval)
+		time.Sleep(time.Second)
 	}
 }
