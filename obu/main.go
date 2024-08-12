@@ -66,6 +66,6 @@ func main() {
 			fmt.Printf("%+v\n", data)
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 5)
 	}
 }
