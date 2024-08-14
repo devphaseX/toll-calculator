@@ -24,15 +24,21 @@ func main() {
 	)
 
 	srv = NewLogMiddleware(srv)
-	go makeGRPCTransport(*grpcListendAddr, srv)
-	makeHTTPTransport(*httpListenAddr, srv)
+	go func() {
+		_, err := makeGRPCTransport(*grpcListendAddr, srv)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	log.Fatal(makeHTTPTransport(*httpListenAddr, srv))
 }
 
-func makeHTTPTransport(listenaddr string, srv Aggregator) {
+func makeHTTPTransport(listenaddr string, srv Aggregator) error {
 	fmt.Println("HTTP transport running on port", listenaddr)
 	http.HandleFunc("/agg", handleAggregate(srv))
 
-	log.Fatal(http.ListenAndServe(listenaddr, nil))
+	return http.ListenAndServe(listenaddr, nil)
 }
 
 func makeGRPCTransport(listenaddr string, srv Aggregator) (*types.None, error) {
