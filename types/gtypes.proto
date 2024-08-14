@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/devphasex/toll-calculator/types";
+
+service DistanceAggregator {
+    rpc AggregateDistance(AggregateRequest) returns (None);
+}
+
+message AggregateRequest {
+    int32 ObuID = 1;
+    double Value = 2;
+    int32 Unix = 3;
+}
+
+message None {}
+
+message Test {
+    int32 data = 1;
+}
