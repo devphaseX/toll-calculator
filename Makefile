@@ -1,3 +1,9 @@
+gate:
+	@go build -o ./bin/gate ./gateway/
+	@./bin/gate
+.PHONY:gate
+
+
 obu:
 	@go build -o ./bin/obu ./obu/
 	@./bin/obu

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"toll-calculator/types"
 
 	"google.golang.org/grpc"
@@ -9,7 +10,7 @@ import (
 
 type GRPCClient struct {
 	Endpoint string
-	types.DistanceAggregatorClient
+	client   types.DistanceAggregatorClient
 }
 
 func NewGRPCClient(endpoint string) (*GRPCClient, error) {
@@ -24,7 +25,12 @@ func NewGRPCClient(endpoint string) (*GRPCClient, error) {
 	c := types.NewDistanceAggregatorClient(conn)
 
 	return &GRPCClient{
-		Endpoint:                 endpoint,
-		DistanceAggregatorClient: c,
+		Endpoint: endpoint,
+		client:   c,
 	}, nil
+}
+
+func (g *GRPCClient) Aggregate(ctx context.Context, aggReq *types.AggregateRequest) error {
+	_, err := g.client.AggregateDistance(ctx, aggReq)
+	return err
 }

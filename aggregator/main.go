@@ -102,8 +102,7 @@ func handleGetInvoice(srv Aggregator) http.HandlerFunc {
 }
 
 func writeJSON(w http.ResponseWriter, s int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(s)
-	w.Header().Add("content-type", "application/json")
-
 	return json.NewEncoder(w).Encode(v)
 }
