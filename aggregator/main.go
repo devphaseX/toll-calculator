@@ -37,6 +37,7 @@ func main() {
 func makeHTTPTransport(listenaddr string, srv Aggregator) error {
 	fmt.Println("HTTP transport running on port", listenaddr)
 	http.HandleFunc("/agg", handleAggregate(srv))
+	http.HandleFunc("/invoice", handleGetInvoice(srv))
 
 	return http.ListenAndServe(listenaddr, nil)
 }

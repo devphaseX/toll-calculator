@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"toll-calculator/aggregator/client"
+	"toll-calculator/types"
 
 	"github.com/sirupsen/logrus"
 )
@@ -39,7 +41,18 @@ func NewInvoiceHandler(c client.Client) *InvoiceHandler {
 }
 
 func (c *InvoiceHandler) handleGetInvoice(w http.ResponseWriter, r *http.Request) error {
-	inv, err := c.client.GetInvoice(context.Background(), 1)
+	obuQuery, ok := r.URL.Query()["obu_id"]
+
+	if !ok || len(obuQuery) == 0 {
+		return fmt.Errorf("missing obu_id in request query")
+
+	}
+
+	obuID := obuQuery[0]
+
+	inv, err := c.client.GetInvoice(context.Background(), &types.GetInvoiceRequest{
+		ObuID: obuID,
+	})
 
 	if err != nil {
 		return writeJSON(w, http.StatusBadRequest, map[string]any{"error": err.Error()})

@@ -12,6 +12,10 @@ message AggregateRequest {
     int32 Unix = 3;
 }
 
+message GetInvoiceRequest {
+    string ObuID = 1;
+}
+
 message None {}
 
 message Test {
