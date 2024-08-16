@@ -56,18 +56,15 @@ func (c *HTTPClient) GetInvoice(ctx context.Context, aggReq *types.GetInvoiceReq
 		Path:   "/invoice",
 	}
 
-	// Create a new url.Values and add the query parameter
 	q := dataUrl.Query()
-	q.Add("obu_id", string(aggReq.ObuID))
+	q.Add("obu_id", aggReq.ObuID)
 
 	// Set the query values back to the URL
 	dataUrl.RawQuery = q.Encode()
 
-	// Get the full URL as a string
 	fullURL := dataUrl.String()
 	fmt.Println(fullURL)
 
-	// Use the full URL in the http.Get call
 	resp, err := http.Get(fullURL)
 	if err != nil {
 		return nil, err
