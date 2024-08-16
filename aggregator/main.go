@@ -2,38 +2,42 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"toll-calculator/types"
 
+	env "github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	httpListenAddr := flag.String("listenaddr", ":5000", "the listen address of the server")
-	grpcListendAddr := flag.String("grpc_listen_add", ":5001", "the listen address of the server")
+	if err := env.Load(); err != nil {
+		log.Fatal(err)
+	}
 
-	flag.Parse()
+	httpListenAddr := os.Getenv("AGG_HTTP_PORT")
+	grpcListendAddr := os.Getenv("AGG_GRPC_PORT")
+
 	var (
-		store            = NewMemoryStore()
+		store            = makeStore()
 		srv   Aggregator = NewInvoiceAggregator(store)
 	)
 
 	srv = NewMetricMiddleware(srv)
 	srv = NewLogMiddleware(srv)
 	go func() {
-		_, err := makeGRPCTransport(*grpcListendAddr, srv)
+		_, err := makeGRPCTransport(grpcListendAddr, srv)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
-	log.Fatal(makeHTTPTransport(*httpListenAddr, srv))
+	log.Fatal(makeHTTPTransport(httpListenAddr, srv))
 }
 
 func makeHTTPTransport(listenaddr string, srv Aggregator) error {

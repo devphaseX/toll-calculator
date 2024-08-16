@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"toll-calculator/types"
 )
 
@@ -46,4 +48,14 @@ func (i *InvoiceAggregator) CalculateInvoice(obuID int) (*types.Invoice, error) 
 	}
 
 	return &invoice, nil
+}
+
+func makeStore() Storer {
+	switch storeType := os.Getenv("AGG_STORE_TYPE"); storeType {
+	case "memory":
+		return NewMemoryStore()
+	default:
+		log.Fatalf("invalid store type given %s", storeType)
+		return nil // this return is unreachable, but it is good practice to include it
+	}
 }
