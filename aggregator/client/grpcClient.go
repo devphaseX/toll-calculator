@@ -14,7 +14,7 @@ type GRPCClient struct {
 }
 
 func NewGRPCClient(endpoint string) (*GRPCClient, error) {
-	conn, err := grpc.Dial(endpoint, []grpc.DialOption{
+	conn, err := grpc.NewClient(endpoint, []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}...)
 
