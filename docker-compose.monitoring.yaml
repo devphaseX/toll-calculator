@@ -1,28 +1,25 @@
 version: "3.8"
-
 services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      # - ./log/prometheus_data:/prometheus
       - ./config/rules.yml:/etc/prometheus/rules.yml
-    networks:
-      - localprom
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    # volumes:
-    #   - grafana_data:/var/lib/grafana
     environment:
       - GF_PATHS_DATA=/var/lib/grafana
       - GF_PATHS_LOGS=/var/log/grafana
@@ -34,29 +31,13 @@ services:
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    networks:
-      - localprom
-    ports:
-      - "9100:9100"
-    # restart: unless-stopped
-
-  # alertmanager:
-  #   image: prom/alertmanager:latest
-  #   container_name: alertmanager
-  #   volumes:
-  #     - ./config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
-  #   networks:
-  #     - localprom
-  #   ports:
-  #     - "9093:9093"
-  #   # restart: unless-stopped
-  #   command:
-  #     - "--config.file=/etc/alertmanager/alertmanager.yml"
-  #     - "--storage.path=/alertmanager"
+    network_mode: "host"
 
 networks:
-  localprom:
+  default:
+    name: localprom
     driver: bridge
+
 volumes:
   grafana_data:
     driver: local
