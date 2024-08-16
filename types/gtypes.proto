@@ -4,16 +4,23 @@ option go_package = "github.com/devphasex/toll-calculator/types";
 
 service DistanceAggregator {
     rpc AggregateDistance(AggregateRequest) returns (None);
+    rpc GetInvoice(GetInvoiceRequest) returns (InvoiceData);
 }
 
 message AggregateRequest {
-    int32 ObuID = 1;
+    int32  ObuID = 1;
     double Value = 2;
-    int32 Unix = 3;
+    int32  Unix  = 3;
 }
 
 message GetInvoiceRequest {
     string ObuID = 1;
+}
+
+message InvoiceData {
+    int32   OBUID          = 1;
+    double	TotalDistance  = 2;
+    double 	TotalAmount    = 3;
 }
 
 message None {}

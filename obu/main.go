@@ -5,14 +5,12 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"os"
 	"time"
 	"toll-calculator/types"
 
 	"github.com/gorilla/websocket"
-)
-
-const (
-	wsEndpoint = "ws://127.0.0.1:3000/ws"
+	"github.com/joho/godotenv"
 )
 
 func genCoord() float64 {
@@ -41,7 +39,11 @@ func generateOBUIDS(n int) []int {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 
+	wsEndpoint := fmt.Sprintf("ws://127.0.0.1%s/ws", os.Getenv("DATA_RECEIVER_WS_PORT"))
 	OBUIDS := generateOBUIDS(20)
 
 	conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)

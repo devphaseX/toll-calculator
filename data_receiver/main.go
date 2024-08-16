@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"toll-calculator/types"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
 const kafkaTopic = "obudata"
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
+
 	recv, err := NewDataReceiver()
 
 	if err != nil {
@@ -19,7 +25,7 @@ func main() {
 	}
 
 	http.HandleFunc("/ws", recv.handleWS)
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(os.Getenv("DATA_RECEIVER_WS_PORT"), nil)
 }
 
 type DataReceiver struct {
