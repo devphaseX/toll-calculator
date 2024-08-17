@@ -25,7 +25,7 @@ services:
       - GF_PATHS_LOGS=/var/log/grafana
       - GF_PATHS_PLUGINS=/var/lib/grafana/plugins
     ports:
-      - "3000:3000"
+      - "4000:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped

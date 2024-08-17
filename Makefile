@@ -3,7 +3,6 @@ gate:
 	@./bin/gate
 .PHONY:gate
 
-
 obu:
 	@go build -o ./bin/obu ./obu/
 	@./bin/obu
@@ -18,7 +17,6 @@ calculator:
 	@go build -o ./bin/calculator ./distance_calculator/
 	@./bin/calculator
 .PHONY:calculator
-
 
 aggregator:
 	@go build -o ./bin/aggregator ./aggregator/

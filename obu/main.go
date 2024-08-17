@@ -32,14 +32,14 @@ func generateOBUIDS(n int) []int {
 	ids := make([]int, 0, n)
 
 	for i := 0; i < n; i++ {
-		ids = append(ids, r.Intn(math.MaxInt))
+		ids = append(ids, int(math.Abs(float64(r.Intn(math.MaxInt)))))
 	}
 
 	return ids
 }
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(".env.local"); err != nil {
 		log.Fatal(err)
 	}
 

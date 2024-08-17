@@ -12,7 +12,7 @@ import (
 const kafkaTopic = "obudata"
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(".env.local"); err != nil {
 		log.Fatal(err)
 	}
 

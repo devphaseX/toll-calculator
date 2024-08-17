@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"toll-calculator/types"
 
 	env "github.com/joho/godotenv"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	if err := env.Load(); err != nil {
+	if err := env.Load(".env.local"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -41,9 +42,12 @@ func main() {
 }
 
 func makeHTTPTransport(listenaddr string, srv Aggregator) error {
+	aggMetrictHandler := NewHTTPMetricCounter("aggregate")
+	invoiceMetricHandler := NewHTTPMetricCounter("invoice")
+
 	fmt.Println("HTTP transport running on port", listenaddr)
-	http.HandleFunc("/agg", handleAggregate(srv))
-	http.HandleFunc("/invoice", handleGetInvoice(srv))
+	http.HandleFunc("/agg", aggMetrictHandler.implement(handleAggregate(srv)))
+	http.HandleFunc("/invoice", invoiceMetricHandler.implement(handleGetInvoice(srv)))
 	http.Handle("/metrics", promhttp.Handler())
 
 	return http.ListenAndServe(listenaddr, nil)
@@ -68,6 +72,11 @@ func makeGRPCTransport(listenaddr string, srv Aggregator) (*types.None, error) {
 
 func handleAggregate(srv Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if method := strings.ToUpper(r.Method); method != "POST" {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": fmt.Sprintf("%s method not allowed", method)})
+			return
+		}
+
 		var distance types.Distance
 
 		if err := json.NewDecoder(r.Body).Decode(&distance); err != nil {
@@ -84,6 +93,11 @@ func handleAggregate(srv Aggregator) http.HandlerFunc {
 
 func handleGetInvoice(srv Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if method := strings.ToUpper(r.Method); method != "GET" {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": fmt.Sprintf("%s method not allowed", method)})
+			return
+		}
+
 		obuIDS, ok := r.URL.Query()["obu_id"]
 
 		if !ok || len(obuIDS) == 0 {
